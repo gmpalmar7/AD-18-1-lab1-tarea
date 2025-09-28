@@ -34,17 +34,17 @@ async function fetchColorsList() {
     const response = await fetch('https://reqres.in/api/unknown', {
       method: 'GET',
       headers: {'x-api-key': 'reqres-free-v1'
-            }
+          }
         });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
         }
     const data = await response.json();
     const colors = data.data;
-        // Guardar en localStorage (Tarea 3)
+        // Guardar en localStorage 
     localStorage.setItem('colorsList', JSON.stringify(colors));
     console.log('Colores guardados en localStorage');
-        // Mostrar los colores (Tarea 2)
+        // Mostrar los colores 
     colors.forEach(color => {
     addItem(color);
         });
