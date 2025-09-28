@@ -1,3 +1,4 @@
+
 const itemsContainer = document.querySelector("#list-items")
 
 function addItem(item) {
@@ -28,13 +29,78 @@ function addItem(item) {
   itemsContainer.append(colourCardBreak)
 }
 
-function fetchColorsList() {
-  
+async function fetchColorsList() {
+    try {
+    const response = await fetch('https://reqres.in/api/unknown', {
+      method: 'GET',
+      headers: {'x-api-key': 'reqres-free-v1'
+            }
+        });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    const data = await response.json();
+    const colors = data.data;
+        // Guardar en localStorage (Tarea 3)
+    localStorage.setItem('colorsList', JSON.stringify(colors));
+    console.log('Colores guardados en localStorage');
+        // Mostrar los colores (Tarea 2)
+    colors.forEach(color => {
+    addItem(color);
+        });
+        
+        console.log('Colores cargados desde la API:', colors);
+        
+    } catch (error) {
+        console.error('Error al cargar colores:', error);
+    }
 }
 
 function loadColorsFromStorage() {
-  
+  try {
+    const storedColors = localStorage.getItem('colorsList');
+    if (storedColors) {
+    const colors = JSON.parse(storedColors);
+        colors.forEach(color => {
+        addItem(color);
+            });
+console.log('Colores cargados desde localStorage:', colors);
+  return true;
+} else {
+console.log('No hay colores guardados en localStorage');
+  return false;
+}
+} catch (error) {
+  console.error('Error al cargar desde localStorage:', error);
+  return false;
+    }
 }
 
-fetchColorsList()
-loadColorsFromStorage()
+
+const loaded = loadColorsFromStorage();
+if (!loaded) {
+    fetchColorsList();
+}
+
+function reloadColors() {
+    itemsContainer.innerHTML = '';
+    fetchColorsList();
+}
+
+function clearColorsList() {
+    itemsContainer.innerHTML = '';
+    localStorage.removeItem('colorsList');
+    console.log('Lista de colores borrada');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const loadBtn = document.getElementById('loadBtn');
+    if (loadBtn) {
+        loadBtn.addEventListener('click', reloadColors);
+    }
+    
+    const clearBtn = document.getElementById('clearBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearColorsList);
+    }
+});
